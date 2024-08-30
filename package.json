@@ -11,6 +11,12 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "mysql2": "^3.11.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
   }
 }

@@ -1,24 +1,23 @@
 import * as fs from "node:fs";
 import { JSONRPCClient } from "json-rpc-2.0";
+import { Base64 } from 'js-base64';
 
 async function run() {
-  /*  const config = readConfigFile('config.json');
+    const config = readConfigFile('config.json');
     if (!config) {
         console.error('Error reading config file');
         return;
     }
 
-    console.log(config);*/
-
-    const url = 'http://192.168.5.180:8181/remote/json-rpc';
+    const url = `http://${config.visonic.ip}:${config.visonic.port}/remote/json-rpc`;
 
     // Create JSON RPC Client
     // @ts-ignore
     const client = new JSONRPCClient((jsonRPCRequest) =>
         fetch(url, {
-            method: "POST",
+            method: 'POST',
             headers: {
-                "content-type": "application/json",
+                'content-type': 'application/json',
             },
             body: JSON.stringify(jsonRPCRequest),
             // @ts-ignore
@@ -34,30 +33,66 @@ async function run() {
         })
     );
 
-    const data = [];
-
-    // Work down from 440
-    for (let i = 440; i >= 0; i--) {
-        const subData = [];
-
-        for (let j = 0; j < 16; j++) {
-            console.log(JSON.stringify(await client.request("PmaxService/getEepromItem", [i, j, 256])));
-        }
+    const dataDir = './data';
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    client
-        .request("PmaxService/getEepromItem", [440, 1, 256])
-        // @ts-ignore
-        .then((result) => console.log(result));
+    // Work down from the start address to the end address
+    for (let i = config.address.start; i >= config.address.end; i--) {
+        let dataString = '';
 
+        console.log(i);
 
+        // Make inital request to get the number of items
+        const initialData = await client.request("PmaxService/getEepromItem", [i, 0, config.timeout.request]);
+
+        // Append the first item
+        dataString += initialData.items[0].item.data;
+
+        // Loop through the rest of the items if `maxItems` is greater than 1
+        if (initialData.items[0].item.maxItems <= 1) {
+            continue;
+        }
+
+        for (let j = 1; j < 16; j++) {
+            try {
+                const data = await client.request("PmaxService/getEepromItem", [i, j, config.timeout.request]);
+
+                const rawData = data.items[0].item.data;
+
+                dataString += '\n' + rawData;
+
+            } catch (error) {
+                continue
+            }
+
+            await sleep(config.sleep);
+        }
+
+        // Write to file (File name is the EEPROM address)
+        fs.writeFileSync(`./data/${i}.txt`, dataString);
+    }
 }
 
 // Config
 interface Config {
     visonic: {
-        url: string;
+        ip: string;
+        port: number;
     };
+    address: {
+        start: number;
+        end: number;
+    },
+    timeout: {
+        request: number;
+    },
+    sleep: number;
+}
+
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const readConfigFile = (filePath: string): Config | null => {

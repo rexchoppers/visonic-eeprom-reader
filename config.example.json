@@ -10,5 +10,5 @@
     "timeout": {
         "request": 2000
     },
-    "sleep": 2500
+    "sleep": 1000
 }

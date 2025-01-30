@@ -58,11 +58,11 @@ function createDataDirectory() {
 async function getDataString(client: any, config: any, address: number) {
     let dataString = '';
 
-    console.log(address);
+    console.log("Address: " + address);
 
     // Make inital request to get the number of items
     const initialData = await client.request("PmaxService/getEepromItem", [address, 0, config.timeout.request]);
-
+    
     // Append the first item
     dataString += initialData.items[0].item.data;
 
@@ -71,8 +71,9 @@ async function getDataString(client: any, config: any, address: number) {
         return dataString;
     }
 
-    for (let j = 1; j < 16; j++) {
+    for (let j = 1; j < initialData.items[0].item.maxItems; j++) {
         try {
+            console.log("Address: " + address + " Item: " + j);
             const data = await client.request("PmaxService/getEepromItem", [address, j, config.timeout.request]);
 
             const rawData = data.items[0].item.data;

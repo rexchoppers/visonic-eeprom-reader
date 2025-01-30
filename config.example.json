@@ -1,0 +1,14 @@
+{
+    "visonic": {
+        "ip": "<Module IP>",
+        "port": "8181"
+    },
+    "address": {
+        "start": 0,
+        "end": 0
+    },
+    "timeout": {
+        "request": 2000
+    },
+    "sleep": 2500
+}

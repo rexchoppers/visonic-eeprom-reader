@@ -2,12 +2,18 @@
   "name": "visonic-eeprom-reader",
   "version": "1.0.0",
   "description": "",
+  "author": "rexchoppers",
   "main": "index.js",
   "scripts": {
+    "run": "tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "visonic",
+    "tyco",
+    "eeprom",
+    "reader"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^22.5.1",
@@ -17,8 +23,6 @@
   "dependencies": {
     "js-base64": "^3.7.7",
     "json-rpc-2.0": "^1.7.0",
-    "mysql2": "^3.11.0",
-    "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.20"
+    "reflect-metadata": "^0.2.2"
   }
 }
